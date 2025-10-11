@@ -1,8 +1,9 @@
 package com.example.demo.service;
 
-import com.example.demo.model.dto.PostCreateDto;
-import com.example.demo.model.dto.PostUpdateDto;
-import com.example.demo.repository.PostEntity;
+import com.example.demo.post.domain.PostCreate;
+import com.example.demo.post.domain.PostUpdate;
+import com.example.demo.post.infrastructure.PostEntity;
+import com.example.demo.post.service.PostService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,14 +39,14 @@ class PostServiceTest {
     @Test
     void PostCreateDto_를_이용하여_게시물을_생성할_수있다() {
         // given
-        PostCreateDto postCreateDto = PostCreateDto.builder()
+        PostCreate postCreate = PostCreate.builder()
                 .content("test-content")
                 .writerId(1L)
                 .build();
 
 
         // when
-        PostEntity postEntity = postService.create(postCreateDto);
+        PostEntity postEntity = postService.create(postCreate);
         // then
         Assertions.assertThat(postEntity.getId()).isNotNull();
         Assertions.assertThat(postEntity.getContent()).isEqualTo("test-content");
@@ -55,12 +56,12 @@ class PostServiceTest {
     @Test
     void PostUpdateDto_를_이용하여_게시물을_수정할_수있다() {
         // given
-        PostUpdateDto postUpdateDto = PostUpdateDto.builder()
+        PostUpdate postUpdate = PostUpdate.builder()
                 .content("test-content-2")
                 .build();
 
         // when
-        postService.update(1L, postUpdateDto);
+        postService.update(1L, postUpdate);
         // then
         PostEntity postEntity =  postService.getById(1L);
         Assertions.assertThat(postEntity.getContent()).isEqualTo("test-content-2");

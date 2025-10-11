@@ -1,11 +1,12 @@
 package com.example.demo.service;
 
-import com.example.demo.exception.CertificationCodeNotMatchedException;
-import com.example.demo.exception.ResourceNotFoundException;
-import com.example.demo.model.UserStatus;
-import com.example.demo.model.dto.UserCreateDto;
-import com.example.demo.model.dto.UserUpdateDto;
-import com.example.demo.repository.UserEntity;
+import com.example.demo.common.domain.exception.CertificationCodeNotMatchedException;
+import com.example.demo.common.domain.exception.ResourceNotFoundException;
+import com.example.demo.user.domain.UserStatus;
+import com.example.demo.user.domain.UserCreate;
+import com.example.demo.user.domain.UserUpdate;
+import com.example.demo.user.infrastructure.UserEntity;
+import com.example.demo.user.service.UserService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
@@ -17,7 +18,6 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlGroup;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 
 @SpringBootTest
@@ -83,7 +83,7 @@ class UserServiceTest {
     @Test
     void UserCreateDto_를_이용하여_유저를_생성할_수있다() {
         // given
-        UserCreateDto userCreateDto = UserCreateDto.builder()
+        UserCreate userCreate = UserCreate.builder()
                 .email("yhr05008@naver.com")
                 .nickname("ek")
                 .address("Seoul")
@@ -94,7 +94,7 @@ class UserServiceTest {
         BDDMockito.doNothing().when(javaMailSender).send(any(SimpleMailMessage.class));
 
         // when
-        UserEntity userEntity = userService.create(userCreateDto);
+        UserEntity userEntity = userService.create(userCreate);
         // then
         Assertions.assertThat(userEntity.getId()).isNotNull();
         Assertions.assertThat(userEntity.getStatus()).isEqualTo(UserStatus.PENDING);
@@ -103,13 +103,13 @@ class UserServiceTest {
     @Test
     void UserUpdateDto_를_이용하여_유저를_수정할_수있다() {
         // given
-        UserUpdateDto userUpdateDto = UserUpdateDto.builder()
+        UserUpdate userUpdate = UserUpdate.builder()
                 .nickname("ek2")
                 .address("Seoul2")
                 .build();
 
         // when
-        userService.update(1L, userUpdateDto);
+        userService.update(1L, userUpdate);
         // then
 
         UserEntity userEntity =  userService.getById(1L);
