@@ -25,15 +25,8 @@ class UserRepositoryTest {
     @Test
     void findByIdAndStatus_로_유저_데이터를_찾아올_수_있다() {
         // given
-        UserEntity userEntity = new UserEntity();
-        userEntity.setEmail("yhr05008@naver.com");
-        userEntity.setAddress("Seoul");
-        userEntity.setStatus(UserStatus.ACTIVE);
-
-
-        // when
-        userRepository.save(userEntity);
-        Optional<UserEntity> byIdAndStatus = userRepository.findByIdAndStatus(userEntity.getId(), UserStatus.ACTIVE);
+       // when
+        Optional<UserEntity> byIdAndStatus = userRepository.findByIdAndStatus(1L, UserStatus.ACTIVE);
 
         // then
         Assertions.assertThat(byIdAndStatus.isPresent()).isTrue();
@@ -42,15 +35,8 @@ class UserRepositoryTest {
     @Test
     void findByIdAndStatus_는_데이터가_없으면_Optional_empt를_내려준다() {
         // given
-        UserEntity userEntity = new UserEntity();
-        userEntity.setEmail("yhr05008@naver.com");
-        userEntity.setAddress("Seoul");
-        userEntity.setStatus(UserStatus.ACTIVE);
-
-
         // when
-        userRepository.save(userEntity);
-        Optional<UserEntity> byIdAndStatus = userRepository.findByIdAndStatus(userEntity.getId(), UserStatus.PENDING);
+        Optional<UserEntity> byIdAndStatus = userRepository.findByIdAndStatus(1L, UserStatus.PENDING);
 
         // then
         Assertions.assertThat(byIdAndStatus.isEmpty()).isTrue();
@@ -59,14 +45,7 @@ class UserRepositoryTest {
     @Test
     void findByEmailAndStatus_로_유저_데이터를_찾아올_수_있다() {
         // given
-        UserEntity userEntity = new UserEntity();
-        userEntity.setEmail("yhr05008@naver.com");
-        userEntity.setAddress("Seoul");
-        userEntity.setStatus(UserStatus.ACTIVE);
-
-
         // when
-        userRepository.save(userEntity);
         Optional<UserEntity> byEmailAndStatus = userRepository.findByEmailAndStatus("yhr05008@naver.com", UserStatus.ACTIVE);
 
         // then
@@ -76,14 +55,7 @@ class UserRepositoryTest {
     @Test
     void findByEmailAndStatus_는_데이터가_없으면_Optional_empt를_내려준다() {
         // given
-        UserEntity userEntity = new UserEntity();
-        userEntity.setEmail("yhr05008@naver.com");
-        userEntity.setAddress("Seoul");
-        userEntity.setStatus(UserStatus.ACTIVE);
-
-
         // when
-        userRepository.save(userEntity);
         Optional<UserEntity> byEmailAndStatus = userRepository.findByEmailAndStatus("yhr05008@naver.com", UserStatus.ACTIVE);
 
         // then
