@@ -12,7 +12,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-
+// 학습용 테스트: H2 인메모리 DB와 JPA 연동 동작을 확인하기 위한 예제
 @ExtendWith(SpringExtension.class) // 스프링 빈 등록, 의존성 주입등을 지원(생략 가능)
 @DataJpaTest(showSql = true) // jpa 관련 컴포넌트 entity, repository만 로드해서 테스트, 실제 DB 대신 기본적인 H2(인메모리 DB)를 사용한다.
 @Sql("/sql/user-repository-test-data.sql")
