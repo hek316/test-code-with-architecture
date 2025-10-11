@@ -1,14 +1,27 @@
 package com.example.demo.controller;
 
+import com.example.demo.model.UserStatus;
+import com.example.demo.model.dto.PostCreateDto;
+import com.example.demo.model.dto.PostUpdateDto;
+import com.example.demo.model.dto.UserCreateDto;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlGroup;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.mockito.ArgumentMatchers.any;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 // 스프링 부트 전체 컨텍스트를 로딩
@@ -19,6 +32,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureTestDatabase
 // 테스트용 인메모리 DB(H2 등) 로 자동 설정
 // 실제 DB에 영향없이 테스트 데이터 관리 가능
+
+@SqlGroup({
+
+        // 각 테스트 실행 전에 더미 데이터 삽입
+        @Sql(value = "/sql/post-controller-test-data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
+        // 테스트 종류 후 데이터 정리
+        @Sql(value = "/sql/delete-all-data.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+})
 class PostControllerTest {
 
     @Autowired
@@ -27,12 +48,51 @@ class PostControllerTest {
     // 컨트롤러 단위 테스트 또는 통합 테스트 시 사용
 
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+
     @Test
-    void 헬스_체크_응답이_200으로_내려온다() throws Exception {
-        // /health_check.html로 GET 요청을 보내고
-        // HTTP 상태 코드가 200(OK)인지 검증
-        mockMvc.perform(get("/health_check.html")).andExpect(status().isOk());
+    void 사용자는_게시물을_단건조회할_수_있다() throws Exception {
+        mockMvc.perform(get("/api/posts/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.content").value("hello"))
+                .andExpect(jsonPath("$.writer.id").isNumber())
+                .andExpect(jsonPath("$.writer.email").value("yhr05008@naver.com"));
     }
+
+    @Test
+    void 사용자가_존재하지_않는_게시물을_조회할_경우_에러가_난다() throws Exception {
+        mockMvc.perform(get("/api/posts/1234"))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("Posts에서 ID 1234를 찾을 수 없습니다."));
+    }
+
+
+
+    @Test
+    void 사용자는_게시물을_수정할_수있다() throws Exception {
+        // given
+        PostUpdateDto postUpdateDto = PostUpdateDto.builder()
+                .content("content-3")
+                .build();
+
+        // when
+        // then
+        mockMvc.perform(put("/api/posts/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(postUpdateDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").isNumber())
+                .andExpect(jsonPath("$.content").value("content-3"))
+                .andExpect(jsonPath("$.modifiedAt").isNumber())
+                .andExpect(jsonPath("$.writer.id").isNumber())
+                .andExpect(jsonPath("$.writer.email").value("yhr05008@naver.com"));
+
+    }
+
+
+
 
 
 }

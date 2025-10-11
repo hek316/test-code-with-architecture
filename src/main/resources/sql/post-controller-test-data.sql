@@ -1,0 +1,2 @@
+insert into users (id, address, certification_code, email, last_login_at, nickname, status) values (1, 'seoul', 'aaa-aa', 'yhr05008@naver.com', 0, 'ek', 'ACTIVE');
+insert into posts (id, content, created_at, modified_at, user_id) values (1, 'hello', 1,0,  1);
