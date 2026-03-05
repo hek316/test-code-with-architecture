@@ -2,17 +2,24 @@ package com.example.demo.service;
 
 import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.model.UserStatus;
+import com.example.demo.model.dto.UserCreateDto;
+import com.example.demo.model.dto.UserUpdateDto;
 import com.example.demo.repository.UserEntity;
 import com.example.demo.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 
 @SpringBootTest
 @Transactional
@@ -23,6 +30,9 @@ class UserServiceTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @MockBean
+    private JavaMailSender javaMailSender;
 
     private long activeUserId;
     private long pendingUserId;
@@ -88,4 +98,41 @@ class UserServiceTest {
                 .isInstanceOf(ResourceNotFoundException.class);
     }
 
+
+    @Test
+    void userCreateDto_를_이용하여_유저를_생성할_수_있다() {
+        // given
+        UserCreateDto userCreateDto = UserCreateDto.builder()
+                .nickname("test3")
+                .email("test3@test.com")
+                .address("test3")
+                .build();
+        BDDMockito.doNothing()
+                .when(javaMailSender).send(any(SimpleMailMessage.class));
+
+        // when
+        UserEntity savedUser = userService.create(userCreateDto);
+
+        // then
+        assertThat(savedUser.getId()).isNotNull();
+        assertThat(savedUser.getStatus()).isEqualTo(UserStatus.PENDING);
+//        assertThat(savedUser.getCertificationCode()).isEqualTo("T.T";
+    }
+
+
+    @Test
+    void UserUpdateDto_를_이용하여_유저를_수정할_수_있다() {
+        // given
+        UserUpdateDto userUpdateDto = UserUpdateDto.builder()
+                .nickname("test3update")
+                .build();
+
+        // when
+        userService.update(activeUserId, userUpdateDto);
+
+        // then
+        UserEntity savedUser = userService.getById(activeUserId);
+        assertThat(savedUser.getNickname()).isEqualTo("test3update");
+
+    }
 }
