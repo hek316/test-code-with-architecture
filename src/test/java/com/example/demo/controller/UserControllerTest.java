@@ -67,7 +67,7 @@ class UserControllerTest {
         // when
         // then
         mockMvc.perform(MockMvcRequestBuilders.get("/api/users/999999"))
-                .andExpect(status().isNotFound())
+                .andExpect(status().isForbidden())
                 .andExpect(content().string("Users에서 ID 999999를 찾을 수 없습니다."));
     }
 
@@ -82,6 +82,18 @@ class UserControllerTest {
 
         UserEntity savedUser = userRepository.findById(activeUserId).get();
         Assertions.assertThat(savedUser.getStatus()).isEqualTo(UserStatus.ACTIVE);
+    }
+
+    @Test
+    void 사용자는_인증_코드가_일치하지_않은_경우_권한_없음_에러를_내려준다() throws Exception {
+        // given
+        // when
+        // then
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/users/" + + activeUserId +"/verify")
+                        .param("certificationCode", "2222"))
+                .andExpect(status().isForbidden())
+                .andExpect(content().string("자격 증명에 실패하였습니다."));
+
     }
 
 
