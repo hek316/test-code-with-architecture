@@ -33,8 +33,6 @@ class UserControllerTest {
     @Autowired
     private UserRepository userRepository;
 
-    @MockBean
-    private JavaMailSender javaMailSender;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
