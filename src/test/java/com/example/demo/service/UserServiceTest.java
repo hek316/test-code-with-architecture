@@ -1,11 +1,13 @@
 package com.example.demo.service;
 
+import com.example.demo.exception.CertificationCodeNotMatchedException;
 import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.model.UserStatus;
 import com.example.demo.model.dto.UserCreateDto;
 import com.example.demo.model.dto.UserUpdateDto;
 import com.example.demo.repository.UserEntity;
 import com.example.demo.repository.UserRepository;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
@@ -16,9 +18,9 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.transaction.annotation.Transactional;
 
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 
 @SpringBootTest
@@ -49,6 +51,7 @@ class UserServiceTest {
         userEntity2.setNickname("test2");
         userEntity2.setEmail("test2@test.com");
         userEntity2.setStatus(UserStatus.PENDING);
+        userEntity2.setCertificationCode("certificationCode");
         pendingUserId = userRepository.save(userEntity2).getId();
     }
 
@@ -116,12 +119,12 @@ class UserServiceTest {
         // then
         assertThat(savedUser.getId()).isNotNull();
         assertThat(savedUser.getStatus()).isEqualTo(UserStatus.PENDING);
-//        assertThat(savedUser.getCertificationCode()).isEqualTo("T.T";
+//        assertThat(savedUser.getCertificationCode()).isEqualTo("T.T"; // FIXME
     }
 
 
     @Test
-    void UserUpdateDto_를_이용하여_유저를_수정할_수_있다() {
+    void userUpdateDto_를_이용하여_유저를_수정할_수_있다() {
         // given
         UserUpdateDto userUpdateDto = UserUpdateDto.builder()
                 .nickname("test3update")
@@ -135,4 +138,42 @@ class UserServiceTest {
         assertThat(savedUser.getNickname()).isEqualTo("test3update");
 
     }
+
+
+    @Test
+    void user를_로그인_시키면_마지막_로그인_시간이_변경된다() {
+        // given// when
+        userService.login(activeUserId);
+
+        // then
+        UserEntity savedUser = userService.getById(activeUserId);
+        assertThat(savedUser.getLastLoginAt()).isGreaterThan(0);
+//        assertThat(savedUser.getLastLoginAt()).isEqualTo("T.T"); // FIXME
+    }
+
+    @Test
+    void PENDING_상태인_사용자는_인증_코드로_ACTIVE_시킬_수_있다() {
+        // given// when
+        String certificationCode = "certificationCode";
+
+        // then
+        userService.verifyEmail(pendingUserId, certificationCode);
+
+        UserEntity savedUser = userRepository.findById(pendingUserId).get();
+
+        assertThat(savedUser.getStatus()).isEqualTo(UserStatus.ACTIVE);
+    }
+
+    @Test
+    void PENDING_상태인_사용자는_잘못된_인증_코드를_받으면_에러를_던진다() {
+        // given
+        String certificationCode = "certificationCode123";
+
+        // when // then
+        Assertions.assertThatThrownBy(() ->userService.verifyEmail(pendingUserId, certificationCode)).isInstanceOf(CertificationCodeNotMatchedException.class);
+
+    }
+
+
+
 }
