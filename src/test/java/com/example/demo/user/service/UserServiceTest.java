@@ -6,8 +6,7 @@ import com.example.demo.user.domain.UserStatus;
 import com.example.demo.user.domain.UserCreate;
 import com.example.demo.user.domain.UserUpdate;
 import com.example.demo.user.infrastructure.UserEntity;
-import com.example.demo.user.infrastructure.UserRepository;
-import com.example.demo.user.service.UserService;
+import com.example.demo.user.infrastructure.UserJpaRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,7 +31,7 @@ class UserServiceTest {
     private UserService userService;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserJpaRepository userJpaRepository;
 
     @MockBean
     private JavaMailSender javaMailSender;
@@ -46,14 +45,14 @@ class UserServiceTest {
         userEntity.setNickname("test");
         userEntity.setEmail("test@test.com");
         userEntity.setStatus(UserStatus.ACTIVE);
-        activeUserId = userRepository.save(userEntity).getId();
+        activeUserId = userJpaRepository.save(userEntity).getId();
 
         UserEntity userEntity2 = new UserEntity();
         userEntity2.setNickname("test2");
         userEntity2.setEmail("test2@test.com");
         userEntity2.setStatus(UserStatus.PENDING);
         userEntity2.setCertificationCode("certificationCode");
-        pendingUserId = userRepository.save(userEntity2).getId();
+        pendingUserId = userJpaRepository.save(userEntity2).getId();
     }
 
     @Test
@@ -160,7 +159,7 @@ class UserServiceTest {
         // then
         userService.verifyEmail(pendingUserId, certificationCode);
 
-        UserEntity savedUser = userRepository.findById(pendingUserId).get();
+        UserEntity savedUser = userJpaRepository.findById(pendingUserId).get();
 
         assertThat(savedUser.getStatus()).isEqualTo(UserStatus.ACTIVE);
     }

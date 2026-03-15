@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class UserRepositoryTest {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserJpaRepository userJpaRepository;
 
     @Test
     void UserRepository_가_제대로_연결되었다() {
@@ -23,7 +23,7 @@ class UserRepositoryTest {
         userEntity.setNickname("test");
 
         // when
-        UserEntity findUser = userRepository.save(userEntity);
+        UserEntity findUser = userJpaRepository.save(userEntity);
 
         // then
         assertThat(findUser.getNickname()).isEqualTo("test");
@@ -35,10 +35,10 @@ class UserRepositoryTest {
         UserEntity userEntity = new UserEntity();
         userEntity.setNickname("test");
         userEntity.setStatus(UserStatus.PENDING);
-        UserEntity findUser = userRepository.save(userEntity);
+        UserEntity findUser = userJpaRepository.save(userEntity);
 
         // when
-        Optional<UserEntity> byIdAndStatus = userRepository.findByIdAndStatus(findUser.getId(), UserStatus.PENDING);
+        Optional<UserEntity> byIdAndStatus = userJpaRepository.findByIdAndStatus(findUser.getId(), UserStatus.PENDING);
 
         // then
         Assertions.assertThat(byIdAndStatus.isPresent()).isTrue();
@@ -48,7 +48,7 @@ class UserRepositoryTest {
     void  findByIdAndStatus_는_데이터가_없으면_Optional_empty_를_내려준다() {
         // given
         // when
-        Optional<UserEntity> byIdAndStatus = userRepository.findByIdAndStatus(2L, UserStatus.PENDING);
+        Optional<UserEntity> byIdAndStatus = userJpaRepository.findByIdAndStatus(2L, UserStatus.PENDING);
 
         // then
         Assertions.assertThat(byIdAndStatus.isEmpty()).isTrue();
@@ -61,10 +61,10 @@ class UserRepositoryTest {
         userEntity.setNickname("test");
         userEntity.setStatus(UserStatus.PENDING);
         userEntity.setEmail("test");
-        UserEntity findUser = userRepository.save(userEntity);
+        UserEntity findUser = userJpaRepository.save(userEntity);
 
         // when
-        Optional<UserEntity> byIdAndStatus = userRepository.findByEmailAndStatus(findUser.getEmail(), UserStatus.PENDING);
+        Optional<UserEntity> byIdAndStatus = userJpaRepository.findByEmailAndStatus(findUser.getEmail(), UserStatus.PENDING);
 
         // then
         Assertions.assertThat(byIdAndStatus.isPresent()).isTrue();
@@ -74,7 +74,7 @@ class UserRepositoryTest {
     void  findByEmailAndStatus_데이터가_없으면_Optional_empty_를_내려준다() {
         // given
         // when
-        Optional<UserEntity> byIdAndStatus = userRepository.findByEmailAndStatus("test", UserStatus.PENDING);
+        Optional<UserEntity> byIdAndStatus = userJpaRepository.findByEmailAndStatus("test", UserStatus.PENDING);
 
         // then
         Assertions.assertThat(byIdAndStatus.isEmpty()).isTrue();

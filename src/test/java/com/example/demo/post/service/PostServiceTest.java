@@ -5,9 +5,9 @@ import com.example.demo.user.domain.UserStatus;
 import com.example.demo.post.domain.PostCreate;
 import com.example.demo.post.domain.PostUpdate;
 import com.example.demo.post.infrastructure.PostEntity;
-import com.example.demo.post.infrastructure.PostRepository;
+import com.example.demo.post.infrastructure.PostJpaRepository;
 import com.example.demo.user.infrastructure.UserEntity;
-import com.example.demo.user.infrastructure.UserRepository;
+import com.example.demo.user.infrastructure.UserJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,10 +28,10 @@ class PostServiceTest {
     private PostService postService;
 
     @Autowired
-    private PostRepository postRepository;
+    private PostJpaRepository postJpaRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserJpaRepository userJpaRepository;
 
     @MockBean
     private JavaMailSender javaMailSender;
@@ -45,13 +45,13 @@ class PostServiceTest {
         userEntity.setNickname("test");
         userEntity.setEmail("test@test.com");
         userEntity.setStatus(UserStatus.ACTIVE);
-        activeUserId = userRepository.save(userEntity).getId();
+        activeUserId = userJpaRepository.save(userEntity).getId();
 
         PostEntity postEntity = new PostEntity();
         postEntity.setContent("테스트 게시물");
         postEntity.setWriter(userEntity);
         postEntity.setCreatedAt(1678530673958L);
-        savedPostId = postRepository.save(postEntity).getId();
+        savedPostId = postJpaRepository.save(postEntity).getId();
     }
 
     @Test

@@ -3,7 +3,7 @@ package com.example.demo.user.controller;
 import com.example.demo.user.domain.UserStatus;
 import com.example.demo.user.domain.UserUpdate;
 import com.example.demo.user.infrastructure.UserEntity;
-import com.example.demo.user.infrastructure.UserRepository;
+import com.example.demo.user.infrastructure.UserJpaRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,7 +29,7 @@ class UserControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserJpaRepository userJpaRepository;
 
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -44,7 +44,7 @@ class UserControllerTest {
         userEntity.setAddress("Seoul");
         userEntity.setStatus(UserStatus.ACTIVE);
         userEntity.setCertificationCode("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
-        activeUserId = userRepository.save(userEntity).getId();
+        activeUserId = userJpaRepository.save(userEntity).getId();
     }
 
     @Test
@@ -80,7 +80,7 @@ class UserControllerTest {
                 .param("certificationCode", "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"))
                 .andExpect(status().isFound());
 
-        UserEntity savedUser = userRepository.findById(activeUserId).get();
+        UserEntity savedUser = userJpaRepository.findById(activeUserId).get();
         Assertions.assertThat(savedUser.getStatus()).isEqualTo(UserStatus.ACTIVE);
     }
 

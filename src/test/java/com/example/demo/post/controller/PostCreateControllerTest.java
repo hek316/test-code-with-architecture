@@ -3,7 +3,7 @@ package com.example.demo.post.controller;
 import com.example.demo.user.domain.UserStatus;
 import com.example.demo.post.domain.PostCreate;
 import com.example.demo.user.infrastructure.UserEntity;
-import com.example.demo.user.infrastructure.UserRepository;
+import com.example.demo.user.infrastructure.UserJpaRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,7 +30,7 @@ class PostCreateControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserJpaRepository userJpaRepository;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -45,7 +45,7 @@ class PostCreateControllerTest {
         userEntity.setAddress("Seoul");
         userEntity.setStatus(UserStatus.ACTIVE);
         userEntity.setCertificationCode("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
-        activeUserId = userRepository.save(userEntity).getId();
+        activeUserId = userJpaRepository.save(userEntity).getId();
 
     }
 

@@ -3,9 +3,9 @@ package com.example.demo.post.controller;
 import com.example.demo.user.domain.UserStatus;
 import com.example.demo.post.domain.PostUpdate;
 import com.example.demo.post.infrastructure.PostEntity;
-import com.example.demo.post.infrastructure.PostRepository;
+import com.example.demo.post.infrastructure.PostJpaRepository;
 import com.example.demo.user.infrastructure.UserEntity;
-import com.example.demo.user.infrastructure.UserRepository;
+import com.example.demo.user.infrastructure.UserJpaRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,10 +33,10 @@ class PostControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserJpaRepository userJpaRepository;
 
     @Autowired
-    private PostRepository postRepository;
+    private PostJpaRepository postJpaRepository;
 
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -53,12 +53,12 @@ class PostControllerTest {
         userEntity.setAddress("Seoul");
         userEntity.setStatus(UserStatus.ACTIVE);
         userEntity.setCertificationCode("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
-        activeUserId = userRepository.save(userEntity).getId();
+        activeUserId = userJpaRepository.save(userEntity).getId();
 
         PostEntity postEntity = new PostEntity();
         postEntity.setContent("content");
         postEntity.setWriter(userEntity);
-        postId = postRepository.save(postEntity).getId();
+        postId = postJpaRepository.save(postEntity).getId();
     }
 
     @Test
