@@ -1,13 +1,14 @@
 package com.example.demo.service;
 
-import com.example.demo.exception.ResourceNotFoundException;
-import com.example.demo.model.UserStatus;
-import com.example.demo.model.dto.PostCreateDto;
-import com.example.demo.model.dto.PostUpdateDto;
-import com.example.demo.repository.PostEntity;
-import com.example.demo.repository.PostRepository;
-import com.example.demo.repository.UserEntity;
-import com.example.demo.repository.UserRepository;
+import com.example.demo.common.domain.exception.ResourceNotFoundException;
+import com.example.demo.user.domain.UserStatus;
+import com.example.demo.post.domain.PostCreate;
+import com.example.demo.post.domain.PostUpdate;
+import com.example.demo.post.infrastructure.PostEntity;
+import com.example.demo.post.infrastructure.PostRepository;
+import com.example.demo.user.infrastructure.UserEntity;
+import com.example.demo.user.infrastructure.UserRepository;
+import com.example.demo.post.service.PostService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,13 +79,13 @@ class PostServiceTest {
     @Test
     void PostCreateDto를_이용하여_게시물을_생성할_수_있다() {
         // given
-        PostCreateDto postCreateDto = PostCreateDto.builder()
+        PostCreate postCreate = PostCreate.builder()
                 .writerId(activeUserId)
                 .content("새 게시물")
                 .build();
 
         // when
-        PostEntity savedPost = postService.create(postCreateDto);
+        PostEntity savedPost = postService.create(postCreate);
 
         // then
         assertThat(savedPost.getId()).isNotNull();
@@ -96,12 +97,12 @@ class PostServiceTest {
     @Test
     void PostUpdateDto를_이용하여_게시물을_수정할_수_있다() {
         // given
-        PostUpdateDto postUpdateDto = PostUpdateDto.builder()
+        PostUpdate postUpdate = PostUpdate.builder()
                 .content("수정된 게시물")
                 .build();
 
         // when
-        postService.update(savedPostId, postUpdateDto);
+        postService.update(savedPostId, postUpdate);
 
         // then
         PostEntity updatedPost = postService.getPostById(savedPostId);
